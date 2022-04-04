@@ -1,24 +1,32 @@
 /* This React Component manages the layout and display of the images and questions for the quiz */
 
-import React, { useState } from 'react';
-import firebase from '../firebase/firebase'
-import { getDocs, getFirestore, collection } from "firebase/firestore";
+import React, { useState, useEffect } from 'react';
+import firebaseApp from './firebase'
+import { getStorage, getDownloadURL, ref} from "firebase/storage";
 
 export const ImageLayout: React.FC = () => {
     const [questionText, setQuestionText] = useState<String>();
+    const [imageURL, setImageURL] = useState<string>('');
 
-    const imageUrl: string = require('./Eday.jpg');
-    const firestoreDB = getFirestore(firebase);
-    
-    // The code below is intended to query the firestore database and access the Questions collection 
-    // At moment it is not complete however it should be an async/await function
+    // const imageUrl: string = require('./Eday.jpg');
 
+    // Create reference to the storage database and get a child reference to a specific file
+    const storage = getStorage(firebaseApp);
+    const storageRef = ref(storage);
+    const fileRef = ref(storageRef, 'CompEng.jpg');
 
-    // const sampleData = async () => await getDocs(collection(firestoreDB, "Questions"));
+    // Asynchronously query the database to get the image url for the specified reference 
+    useEffect(()=>{
+        const getImages = async() => {
+            // Update imageURL state
+            setImageURL(await getDownloadURL(fileRef))
+        }
+        getImages();
+    }, []);
 
     return(
         <div>
-            <img alt='Two Engineers' style={{width: 100, height: 100 }} src={imageUrl}></img>
+            <img alt='Ingenium alt text' style={{width: 100, height: 100 }} src={imageURL}></img>
         </div>
     );
 }
